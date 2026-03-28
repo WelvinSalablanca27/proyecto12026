@@ -17,6 +17,22 @@
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
+/* Navbar */
+.color-navbar {
+    background-color: #886F47 !important;
+    background-image: linear-gradient(
+        90deg,
+        #121b96 0%,
+        #2889b6 50%,
+        #2697cc 100%
+    );
+}
+
+/* Texto de la marca */
+.color-texto-marca {
+    color: #1e3d87 !important;
+    font-size: 18px;
+}
 
 @keyframes logo-spin {
   from {
