@@ -1,3 +1,4 @@
+import React from "react";
 import { Navigate } from "react-router-dom";
 
 const RutaProtegida = ({ children }) => {
@@ -10,6 +11,7 @@ const RutaProtegida = ({ children }) => {
   // Si está autenticado,redirige a la página de login
   return estaLogueado ? children : <Navigate to="/login" replace />;
 };
+
 
 export default RutaProtegida;
 

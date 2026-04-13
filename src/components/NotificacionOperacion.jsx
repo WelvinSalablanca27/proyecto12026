@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Toast, ToastContainer } from "bootstrap";
+import { Toast, ToastContainer } from "react-bootstrap";
 
 const NotificacionOperacion = ({ mostrar, mensaje, tipo, onCerrar }) => {
     const [Visible, setVisible] = useState(mostrar);

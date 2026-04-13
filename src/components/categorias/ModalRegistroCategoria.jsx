@@ -42,7 +42,6 @@ const ModalRegistroCategoria = ({
                             placeholder="Ingresa el nombre"
                         />
                     </Form.Group>
-
                     <Form.Group className="mb-3">
                         <Form.Label>Descripción</Form.Label>
                         <Form.Control
@@ -58,12 +57,9 @@ const ModalRegistroCategoria = ({
             </Modal.Body>
             <Modal.Footer>
                 <Button
-                    variant="secondary"
-                    onClick={() => setMostrarModal(false)}
-                >
+                    variant="secondary" onClick={() => setMostrarModal(false)}>
                     Cancelar
                 </Button>
-
                 <Button
                     variant="primary"
                     onClick={handleRegistrar}
