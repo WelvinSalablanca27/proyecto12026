@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import FormularioLogin from '../components/login/FormularioLogin';
-import { supabase } from '../database/supabaseconfig';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import FormularioLogin from "../components/login/FormularioLogin";
+import { supabase } from "../database/supabaseconfig";
 
 const Login = () => {
 
@@ -28,7 +28,7 @@ const Login = () => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: usuario,
-        password: contrasena
+        password: contrasena,
       });
 
       if (error) {

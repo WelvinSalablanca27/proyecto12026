@@ -5,7 +5,7 @@ const ModalRegistroCategoria = ({
     mostrarModal,
     setMostrarModal,
     nuevaCategoria,
-    manejarCambioInput,
+    manejoCambioInput,
     agregarCategoria,
 }) => {
 
@@ -38,7 +38,7 @@ const ModalRegistroCategoria = ({
                             type="text"
                             name="nombre_categoria"
                             value={nuevaCategoria.nombre_categoria}
-                            onChange={manejarCambioInput}
+                            onChange={manejoCambioInput}
                             placeholder="Ingresa el nombre"
                         />
                     </Form.Group>
@@ -49,7 +49,7 @@ const ModalRegistroCategoria = ({
                             rows={3}
                             name="descripcion_categoria"
                             value={nuevaCategoria.descripcion_categoria}
-                            onChange={manejarCambioInput}
+                            onChange={manejoCambioInput}
                             placeholder="Ingresa la descripción"
                         />
                     </Form.Group>
