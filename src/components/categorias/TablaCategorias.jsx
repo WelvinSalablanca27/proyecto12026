@@ -32,7 +32,7 @@ const TablaCategorias = ({
                         <tr>
                             <th>ID</th>
                             <th>Nombre</th>
-                            <th className="d-none d-md-table-cell"> Descripcion</th>
+                            <th className="d-none d-md-table-cell"> DescripciÓn</th>
                             <th className="text-center"> Acciones</th>
                         </tr>
                     </thead>

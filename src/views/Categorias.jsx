@@ -13,7 +13,7 @@ const Categorias = () => {
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
-  const [categoriaAEliminar, setCategoriaAElimisinar] = useState(null);
+  const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
   const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
 
   const [categoriaEditar, setCategoriaEditar] = useState({
@@ -53,6 +53,14 @@ const Categorias = () => {
     }));
   };
 
+  const manejoCambioInputEd = (e) => {
+    const { name, value } = e.target;
+    setCategoriaEditar((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const cargarCategorias = async () => {
     try {
       setCargando(true);
@@ -84,6 +92,54 @@ const Categorias = () => {
       setCargando(false);
     }
   };
+  const actualizarCategoria = async () => {
+    try {
+      if (
+        !categoriaEditar.nombre_categoria.trim() ||
+        !categoriaEditar.descripcion_categoria.trim()
+      ) {
+        setToast({
+          mostrar: true,
+          mensaje: "Debe llenar todos los campos",
+          tipo: "advertencia"
+        });
+        return;
+      }
+      setMostrarModalEdicion(false)
+
+      const { error } = await supabase
+        .from("categorias")
+        .update({
+          nombre_categoria: categoriaEditar.nombre_categoria,
+          descripcion_categoria: categoriaEditar.descripcion_categoria,
+        })
+        .eq("id_categoria", categoriaEditar.id_categoria);
+
+      if (error) {
+        console.error("Error al actualizar categoria:", error.message);
+        setToast({
+          mostrar: true,
+          mensaje: `Error ala actualizar categoria "${categoriaEditar.nombre_categoria}.`,
+          tipo: "exito",
+        });
+        return;
+      }
+      await cargarCategorias();
+      setToast({
+        mostrar: true,
+        mensaje: "Error inesperado al actualizar categoria.",
+        tipo: "exito",
+      });
+
+    } catch (err) {
+      setToast({
+        mostrar: true,
+        mensaje: "Error inesperado al actualizar categoría.",
+        tipo: "error",
+      });
+      console.error("Excepción al actualizar categoría:", err.message);
+    }
+  };
 
   const agregarCategoria = async () => {
     try {
@@ -108,13 +164,10 @@ const Categorias = () => {
 
       if (error) {
         console.error("Error al agregar categoría:", error.message);
-        setToast({
-          mostrar: true,
-          mensaje: "Error al registrar categoría.",
-          tipo: "error",
-        });
         return;
       }
+
+      await cargarCategorias(); // 🔥 FALTABA ESTO
 
       setToast({
         mostrar: true,
@@ -122,16 +175,11 @@ const Categorias = () => {
         tipo: "exito",
       });
 
-      setNuevaCategoria({ nombre_categoria: "", descripcion_categoria: ""});
+      setNuevaCategoria({ nombre_categoria: "", descripcion_categoria: "" });
       setMostrarModal(false);
 
     } catch (err) {
-      console.error("Excepción al agregar categoría:", err.message);
-      setToast({
-        mostrar: true,
-        mensaje: "Error inesperado al registrar categoría.",
-        tipo: "error",
-      });
+      console.error("Excepción:", err.message);
     }
   };
 
@@ -146,8 +194,8 @@ const Categorias = () => {
         </Col>
 
         <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} 
-          size="md"
+          <Button onClick={() => setMostrarModal(true)}
+            size="md"
           >
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">Nueva Categoría</span>
@@ -168,7 +216,7 @@ const Categorias = () => {
 
       {!cargando && categorias.length > 0 && (
         <Row>
-          <Col lg={12} className="d-none d-lg-block">
+          <Col xs={12} className="d-none d-lg-block">
             <TablaCategorias
               categorias={categorias}
               abrirModalEdicion={abrirModalEdicion}
@@ -196,5 +244,4 @@ const Categorias = () => {
     </Container>
   );
 };
-
 export default Categorias;
