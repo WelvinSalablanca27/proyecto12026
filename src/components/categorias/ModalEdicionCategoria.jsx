@@ -11,6 +11,7 @@ const ModalEdicionCategoria = ({
 }) => {
 
     const [deshabilitado, setDeshabilitado] = useState(false);
+    
     const handleActualizar = async () => {
         if (deshabilitado) return;
         setDeshabilitado(true);
