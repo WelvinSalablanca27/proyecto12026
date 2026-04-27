@@ -4,14 +4,14 @@ import { Await } from "react-router-dom";
 
 const ModalEdicionCategoria = ({
     mostrarModalEdicion,
-    setMostrarModalEdicio,
+    setMostrarModalEdicion,
     categoriaEditar,
     manejoCambioInputEdicion,
     actualizarCategoria,
 }) => {
 
     const [deshabilitado, setDeshabilitado] = useState(false);
-    
+
     const handleActualizar = async () => {
         if (deshabilitado) return;
         setDeshabilitado(true);
@@ -43,7 +43,7 @@ const ModalEdicionCategoria = ({
                         />
                     </Form.Group>
 
-                    <Form.Group>
+                    <Form.Group className="mb-3">
                         <Form.Label>Descripcion</Form.Label>
                         <Form.Control
                             as="textarea"
