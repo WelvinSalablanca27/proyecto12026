@@ -150,7 +150,7 @@ const Encabezado = () => {
                 >
                     <img
                         alt=""
-                        src="/logo.png"
+                        src={logo}
                         width="45"
                         height="45"
                         className="d-inline-block me-2"
