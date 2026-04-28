@@ -4,6 +4,7 @@ import { supabase } from "../database/supabaseconfig";
 
 // 🔍 Importa el componente de búsqueda para filtrar categorías
 import CuadrosBusquedas from "../components/busquedas/CuadroBusquedas";
+import Paginacion from "../components/ordenamiento/Paginacion";
 
 // 📦 Importación de modales y componentes auxiliares
 import ModalRegistroCategoria from "../components/categorias/ModalRegistroCategoria";
@@ -36,6 +37,15 @@ const Categorias = () => {
   const [textoBusqueda, setTextoBusqueda] = useState("");
   const [categoriaFiltradas, setCategoriasFiltradas] = useState([]);
 
+  // 📌 Cantidad de registros que se mostrarán por cada página
+  const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
+  const [paginaActual, establecerPaginaActual] = useState(1)
+
+  // 📌 Lista de categorías ya filtradas y divididas según la página actual
+  const categoriasPaginadas = categoriaFiltradas.slice(
+    (paginaActual - 1) * registrosPorPagina,
+    paginaActual * registrosPorPagina
+  );
   // ✏️ Datos de categoría en edición
   const [categoriaEditar, setCategoriaEditar] = useState({
     id_categoria: "",
@@ -226,7 +236,7 @@ const Categorias = () => {
       // ⚠️ Aquí hay un pequeño detalle: el mensaje dice error pero es éxito
       setToast({
         mostrar: true,
-        mensaje: "Error inesperado al actualizar categoria.",
+        mensaje: "Confimardo la Actualizacion",
         tipo: "exito",
       });
 
@@ -364,6 +374,13 @@ const Categorias = () => {
         agregarCategoria={agregarCategoria}
       />
 
+      <Paginacion
+        registrosPorPagina={registrosPorPagina}
+        totalRegistros={categoriaFiltradas.length}
+        paginaActual={paginaActual}
+        establecerPaginaActual={establecerPaginaActual}
+        establecerRegistrosPorPagina={establecerRegistrosPorPagina}
+      />
       <ModalEdicionCategoria
         mostrarModalEdicion={mostrarModalEdicion}
         setMostrarModalEdicion={setMostrarModalEdicion}
