@@ -159,7 +159,7 @@ const Encabezado = () => {
                         <h4 className="mb-0">Discosa</h4>
                     </strong>
                 </Navbar.Brand>
-                
+
                 {/* Boton del menu*/}
                 {!esLogin && (
                     <Navbar.Toggle
