@@ -9,7 +9,7 @@ const TarjetaCategoria = ({
 }) => {
 
     const [cargando, setCargado] = useState(true);
-    const [idTarjetaActiva, setIdTarjetaActiva] = useEffect(null);
+    const [idTarjetaActiva, setIdTarjetaActiva] = useState(null);
 
     useEffect(() => {
         setCargado(!(categorias && categorias.length > 0));
@@ -27,9 +27,10 @@ const TarjetaCategoria = ({
     const alternarTarjetaActiva = (id) => {
         setIdTarjetaActiva((anterior) => (anterior === id ? null : id));
     };
-
-    {
-        cargando ? (
+    
+    return (
+    <>
+        {cargando ? (
             <div className="text-center my-5">
                 <h5>Cargando categorias...</h5>
                 <Spinner animation="border" variant="success" role="status" />
@@ -37,7 +38,7 @@ const TarjetaCategoria = ({
         ) : (
             <div>
                 {categorias.map((categoria) => {
-                    const tarjetaActiva = idTarjetaActiva === categoria.id_categoria
+                    const tarjetaActiva = idTarjetaActiva === categoria.id_categoria;
 
                     return (
                         <Card
@@ -56,13 +57,13 @@ const TarjetaCategoria = ({
                             <Card.Body
                                 className={`p-2 tarjeta-categoria-cuerpo ${tarjetaActiva
                                     ? "tarjeta-categoria-cuerpo-activo"
-                                    : "tarjeta-categoria-cuerpo-activo"
+                                    : "tarjeta-categoria-cuerpo-inactivo"
                                     }`}
                             >
                                 <Row className="align-items-center gx-3">
                                     <Col xs={2} className="px-2">
                                         <div
-                                            className="big-light d-flex align-itms-center justify-content-center rounded tarjeta-categoria-placeholder-imagen"
+                                            className="big-light d-flex align-items-center justify-content-center rounded tarjeta-categoria-placeholder-imagen"
                                         >
                                             <i className="bi bi-bookmark text-muted fs-3"></i>
                                         </div>
@@ -81,7 +82,7 @@ const TarjetaCategoria = ({
                                         xs={5}
                                         className="d-flex flex-column align-items-end justify-content-center text-end"
                                     >
-                                        <div className="fw-semibold small">Activa</div>
+                                        <div className="badge bg-success">Activa</div>
                                     </Col>
                                 </Row>
                             </Card.Body>
@@ -132,8 +133,9 @@ const TarjetaCategoria = ({
                 })}
             </div>
         )
-    }
-
+        }
+    </>
+    )
 };
 
 export default TarjetaCategoria;

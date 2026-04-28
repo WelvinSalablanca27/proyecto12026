@@ -2,37 +2,59 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 
+// 🔍 Importa el componente de búsqueda para filtrar categorías
+import CuadrosBusquedas from "../components/busquedas/CuadroBusquedas";
+
+// 📦 Importación de modales y componentes auxiliares
 import ModalRegistroCategoria from "../components/categorias/ModalRegistroCategoria";
 import ModalEdicionCategoria from "../components/categorias/ModalEdicionCategoria"
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import TablaCategorias from "../components/categorias/TablaCategorias";
 import ModalEliminacionCategoria from "../components/categorias/ModalEliminacionCategoria";
+import TarjetaCategoria from "../components/categorias/TarjetaCategoria";
 
 const Categorias = () => {
+
+  // 🔔 Estado para mostrar notificaciones (toast)
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
+
+  // 📌 Control de visibilidad del modal de registro
   const [mostrarModal, setMostrarModal] = useState(false);
 
+  // 📊 Lista de categorías y estado de carga
   const [categorias, setCategorias] = useState([]);
   const [cargando, setCargando] = useState(true);
+
+  // 🗑️ Control de eliminación
   const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
   const [categoriaAEliminar, setCategoriaAEliminar] = useState(null);
+
+  // ✏️ Control de edición
   const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
 
+  // 🔎 Búsqueda
+  const [textoBusqueda, setTextoBusqueda] = useState("");
+  const [categoriaFiltradas, setCategoriasFiltradas] = useState([]);
+
+  // ✏️ Datos de categoría en edición
   const [categoriaEditar, setCategoriaEditar] = useState({
     id_categoria: "",
     nombre_categoria: "",
     descripcion_categoria: "",
   });
 
+  // ➕ Datos para nueva categoría
   const [nuevaCategoria, setNuevaCategoria] = useState({
     nombre_categoria: "",
     descripcion_categoria: "",
   });
 
+  // 🚀 Carga inicial de categorías
   useEffect(() => {
     cargarCategorias();
   }, []);
 
+  // ✏️ Abre el modal de edición con datos cargados
   const abrirModalEdicion = (categoria) => {
     setCategoriaEditar({
       id_categoria: categoria.id_categoria,
@@ -42,11 +64,13 @@ const Categorias = () => {
     setMostrarModalEdicion(true);
   };
 
+  // 🗑️ Abre modal de confirmación de eliminación
   const abrirModalEliminacion = (categoria) => {
     setCategoriaAEliminar(categoria);
     setMostrarModalEliminacion(true);
   };
 
+  // ✍️ Maneja inputs de nueva categoría
   const manejoCambioInput = (e) => {
     const { name, value } = e.target;
     setNuevaCategoria((prev) => ({
@@ -55,6 +79,7 @@ const Categorias = () => {
     }));
   };
 
+  // ✍️ Maneja inputs de edición
   const manejoCambioInputEdicion = (e) => {
     const { name, value } = e.target;
     setCategoriaEditar((prev) => ({
@@ -63,6 +88,26 @@ const Categorias = () => {
     }));
   };
 
+  // 🔍 Manejo del texto de búsqueda
+  const manejoBusqueda = (e) => {
+    setTextoBusqueda(e.target.value);
+  };
+
+  // 🔎 Filtrado dinámico de categorías
+  useEffect(() => {
+    if (!textoBusqueda.trim()) {
+      setCategoriasFiltradas(categorias);
+    } else {
+      const textoLower = textoBusqueda.toLowerCase().trim();
+      const filtradas = categorias.filter((cat) =>
+        cat.nombre_categoria.toLowerCase().includes(textoLower) ||
+        cat.descripcion_categoria.toLowerCase().includes(textoLower)
+      );
+      setCategoriasFiltradas(filtradas);
+    }
+  }, [textoBusqueda, categorias]);
+
+  // 📥 Cargar categorías desde Supabase
   const cargarCategorias = async () => {
     try {
       setCargando(true);
@@ -95,8 +140,10 @@ const Categorias = () => {
     }
   };
 
+  // ➕ Agregar nueva categoría
   const agregarCategoria = async () => {
     try {
+      // ⚠️ Validación de campos vacíos
       if (
         !nuevaCategoria.nombre_categoria.trim() ||
         !nuevaCategoria.descripcion_categoria.trim()
@@ -123,12 +170,14 @@ const Categorias = () => {
 
       await cargarCategorias();
 
+      // ✅ Mensaje de éxito
       setToast({
         mostrar: true,
         mensaje: `Categoría "${nuevaCategoria.nombre_categoria}" registrada exitosamente.`,
         tipo: "exito",
       });
 
+      // 🔄 Reset formulario
       setNuevaCategoria({ nombre_categoria: "", descripcion_categoria: "" });
       setMostrarModal(false);
 
@@ -137,6 +186,7 @@ const Categorias = () => {
     }
   };
 
+  // ✏️ Actualizar categoría existente
   const actualizarCategoria = async () => {
     try {
       if (
@@ -150,6 +200,7 @@ const Categorias = () => {
         });
         return;
       }
+
       setMostrarModalEdicion(false)
 
       const { error } = await supabase
@@ -169,7 +220,10 @@ const Categorias = () => {
         });
         return;
       }
+
       await cargarCategorias();
+
+      // ⚠️ Aquí hay un pequeño detalle: el mensaje dice error pero es éxito
       setToast({
         mostrar: true,
         mensaje: "Error inesperado al actualizar categoria.",
@@ -186,8 +240,10 @@ const Categorias = () => {
     }
   };
 
+  // 🗑️ Eliminar categoría
   const eliminarCategoria = async () => {
     if (!categoriaAEliminar) return;
+
     try {
       setMostrarModalEliminacion(false);
 
@@ -207,11 +263,13 @@ const Categorias = () => {
       }
 
       await cargarCategorias();
+
       setToast({
         mostrar: true,
         mensaje: `Catgoria ${categoriaAEliminar.nombre_categoria} eliminada exitosamente.`,
         tipo: "exito"
       });
+
     } catch (err) {
       setToast({
         mostrar: true,
@@ -225,6 +283,7 @@ const Categorias = () => {
   return (
     <Container className="mt-3">
 
+      {/* 📌 Encabezado */}
       <Row className="align-items-center mb-3">
         <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
           <h3 className="mb-0">
@@ -232,10 +291,9 @@ const Categorias = () => {
           </h3>
         </Col>
 
+        {/* ➕ Botón nueva categoría */}
         <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)}
-            size="md"
-          >
+          <Button onClick={() => setMostrarModal(true)} size="md">
             <i className="bi-plus-lg"></i>
             <span className="d-none d-sm-inline ms-2">Nueva Categoría</span>
           </Button>
@@ -244,6 +302,29 @@ const Categorias = () => {
 
       <hr />
 
+      {/* 🔍 Cuadro de Busqueda debajo de la linea divisoria */}
+      <Row className="mb-4">
+        <Col md={6} lg={5}>
+          <CuadrosBusquedas
+            textoBusqueda={textoBusqueda}
+            manejarCambioBusqueda={manejoBusqueda}
+          />
+        </Col>
+      </Row>
+
+      {/* ⚠️ Mensaje si no hay resultados */}
+      {!cargando && textoBusqueda.trim() && categoriaFiltradas.length === 0 && (
+        <Row>
+          <Col>
+            <div className="alert alert-info text-center">
+              <i className="bi bi-info-circle me-2"></i>
+              No se encontraron categorías con "{textoBusqueda}"
+            </div>
+          </Col>
+        </Row>
+      )}
+
+      {/* ⏳ Loader */}
       {cargando && (
         <Row className="text-center my-5">
           <Col>
@@ -253,11 +334,20 @@ const Categorias = () => {
         </Row>
       )}
 
-      {!cargando && categorias.length > 0 && (
+      {/* 📊 Tabla en escritorio */}
+      {!cargando && categoriaFiltradas.length > 0 && (
         <Row>
           <Col xs={12} className="d-none d-lg-block">
             <TablaCategorias
-              categorias={categorias}
+              categorias={categoriaFiltradas}
+              abrirModalEdicion={abrirModalEdicion}
+              abrirModalEliminacion={abrirModalEliminacion}
+            />
+          </Col>
+          {/* 📱 Vista en tarjetas para móvil */}
+          <Col xs={12} sm={12} md={12} className="d-lg-none">
+            <TarjetaCategoria
+              categorias={categoriaFiltradas}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
             />
@@ -265,6 +355,7 @@ const Categorias = () => {
         </Row>
       )}
 
+      {/* 📦 Modales */}
       <ModalRegistroCategoria
         mostrarModal={mostrarModal}
         setMostrarModal={setMostrarModal}
@@ -288,6 +379,7 @@ const Categorias = () => {
         categoria={categoriaAEliminar}
       />
 
+      {/* 🔔 Notificaciones */}
       <NotificacionOperacion
         mostrar={toast.mostrar}
         mensaje={toast.mensaje}
@@ -298,4 +390,5 @@ const Categorias = () => {
     </Container>
   );
 };
+
 export default Categorias;
