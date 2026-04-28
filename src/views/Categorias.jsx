@@ -35,14 +35,14 @@ const Categorias = () => {
 
   // 🔎 Búsqueda
   const [textoBusqueda, setTextoBusqueda] = useState("");
-  const [categoriaFiltradas, setCategoriasFiltradas] = useState([]);
+  const [categoriasFiltradas, setCategoriasFiltradas] = useState([]);
 
   // 📌 Cantidad de registros que se mostrarán por cada página
   const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
-  const [paginaActual, establecerPaginaActual] = useState(1)
+  const [paginaActual, establecerPaginaActual] = useState(1);
 
   // 📌 Lista de categorías ya filtradas y divididas según la página actual
-  const categoriasPaginadas = categoriaFiltradas.slice(
+  const categoriasPaginadas = categoriasFiltradas.slice(
     (paginaActual - 1) * registrosPorPagina,
     paginaActual * registrosPorPagina
   );
@@ -323,7 +323,7 @@ const Categorias = () => {
       </Row>
 
       {/* ⚠️ Mensaje si no hay resultados */}
-      {!cargando && textoBusqueda.trim() && categoriaFiltradas.length === 0 && (
+      {!cargando && textoBusqueda.trim() && categoriasFiltradas.length === 0 && (
         <Row>
           <Col>
             <div className="alert alert-info text-center">
@@ -345,11 +345,11 @@ const Categorias = () => {
       )}
 
       {/* 📊 Tabla en escritorio */}
-      {!cargando && categoriaFiltradas.length > 0 && (
+      {!cargando && categoriasFiltradas.length > 0 && (
         <Row>
           <Col xs={12} className="d-none d-lg-block">
             <TablaCategorias
-              categorias={categoriaFiltradas}
+              categorias={categoriasFiltradas}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
             />
@@ -357,7 +357,7 @@ const Categorias = () => {
           {/* 📱 Vista en tarjetas para móvil */}
           <Col xs={12} sm={12} md={12} className="d-lg-none">
             <TarjetaCategoria
-              categorias={categoriaFiltradas}
+              categorias={categoriasFiltradas}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
             />
@@ -374,13 +374,17 @@ const Categorias = () => {
         agregarCategoria={agregarCategoria}
       />
 
-      <Paginacion
-        registrosPorPagina={registrosPorPagina}
-        totalRegistros={categoriaFiltradas.length}
-        paginaActual={paginaActual}
-        establecerPaginaActual={establecerPaginaActual}
-        establecerRegistrosPorPagina={establecerRegistrosPorPagina}
-      />
+      {/* Paginación */}
+      {categoriasFiltradas.length > 0 && (
+        <Paginacion
+          registrosPorPagina={registrosPorPagina}
+          totalRegistros={categoriasFiltradas.length}
+          paginaActual={paginaActual}
+          establecerPaginaActual={establecerPaginaActual}
+          establecerRegistrosPorPagina={establecerRegistrosPorPagina}
+        />
+      )}
+      
       <ModalEdicionCategoria
         mostrarModalEdicion={mostrarModalEdicion}
         setMostrarModalEdicion={setMostrarModalEdicion}

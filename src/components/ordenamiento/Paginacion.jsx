@@ -4,63 +4,68 @@ import { Row, Col, Form } from "react-bootstrap";
 
 const Paginacion = ({
     registrosPorPagina,
-    totalRegistro,
+    totalRegistros,
     paginaActual,
     establecerPaginaActual,
     establecerRegistrosPorPagina
 }) => {
 
-    //calcular el total de paginas
-    const totalPaginas = Math.ceil(totalRegistro / registrosPorPagina);
+    // Calcular el total de páginas
+    const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
 
-    //cambiar paginas
+    // Cambiar de página
     const cambiarPagina = (numeroPagina) => {
         if (numeroPagina >= 1 && numeroPagina <= totalPaginas) {
             establecerPaginaActual(numeroPagina);
         }
     };
 
-    //Cambiar la cantidad de registros por pagina
-    const cambiarCantidadRegistros = (evento) =>{
-    establecerRegistrosPorPagina(Number(evento.target.value));
-    establecerPaginaActual(1);
-};
+    // Cambiar la cantidad de registros por página
+    const cambiarCantidadRegistros = (evento) => {
+        establecerRegistrosPorPagina(Number(evento.target.value));
+        establecerPaginaActual(1);
+    };
 
-//Genrar los botones de paginacion
-const elementosPaginacion = [];
-const maximoPaginasMostrar = 3;
+    // Generar los botones de paginación
+    const elementosPaginacion = [];
+    const maximoPaginasAMostrar = 3;
 
-let paginaInicio = Math.max(
-    1,
-    paginaActual - Math.floor(maximoPaginasMostrar / 2)
-);
-
-let paginaFin = Math.min(
-    totalPaginas,
-    paginaInicio + maximoPaginasMostrar - 1
-);
-
-if (paginaFin - paginaInicio + 1 < maximoPaginasMostrar) {
-    paginaInicio = Math.max(
+    let paginaInicio = Math.max(
         1,
-        paginaFin - maximoPaginasMostrar + 1
+        paginaActual - Math.floor(maximoPaginasAMostrar / 2)
     );
-};
 
-for (let numeroPagina = paginaInicio; numeroPagina <= paginaInicio; numeroPagina++) {
-    elementosPaginacion.push(
-        <Pagination.Item
-            key={numeroPagina}
-            active={numeroPagina === paginaActual}
-            onClick={() => cambiarPagina(numeroPagina)}
-        >
-            {numeroPagina}
-        </Pagination.Item>
+    let paginaFin = Math.min(
+        totalPaginas,
+        paginaInicio + maximoPaginasAMostrar - 1
     );
-}
+
+    if (paginaFin - paginaInicio + 1 < maximoPaginasAMostrar) {
+        paginaInicio = Math.max(
+            1,
+            paginaFin - maximoPaginasAMostrar + 1
+        );
+    }
+
+    for (
+        let numeroPagina = paginaInicio;
+        numeroPagina <= paginaFin;
+        numeroPagina++
+    ) {
+        elementosPaginacion.push(
+            <Pagination.Item
+                key={numeroPagina}
+                active={numeroPagina === paginaActual}
+                onClick={() => cambiarPagina(numeroPagina)}
+            >
+                {numeroPagina}
+            </Pagination.Item>
+        );
+    }
     return (
         <Row className="mt-1 align-items-center">
-            {/* Selector de cantidad de registro*/}
+
+            {/* Selector de cantidad de registros */}
             <Col xs="auto">
                 <Form.Select
                     size="sm"
@@ -75,7 +80,7 @@ for (let numeroPagina = paginaInicio; numeroPagina <= paginaInicio; numeroPagina
                 </Form.Select>
             </Col>
 
-            {/* Controles de paginacion*/}
+            {/* Controles de paginación */}
             <Col className="d-flex justify-content-center">
                 <Pagination className="shadow-sm mt-2">
 
@@ -104,11 +109,11 @@ for (let numeroPagina = paginaInicio; numeroPagina <= paginaInicio; numeroPagina
                         onClick={() => cambiarPagina(totalPaginas)}
                         disabled={paginaActual === totalPaginas}
                     />
+
                 </Pagination>
             </Col>
+
         </Row>
     );
 };
-
-
 export default Paginacion;
