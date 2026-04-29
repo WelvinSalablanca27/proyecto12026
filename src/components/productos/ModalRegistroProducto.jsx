@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal, Form, Button, Row, Col, ModalBody } from "react-bootstrap";
 
 const ModalRegistroProducto = ({
-    mostrarlModal,
+    mostrarModal,
     setMostrarModal,
     nuevoProducto,
     manejoCambioInput,
@@ -21,14 +21,13 @@ const ModalRegistroProducto = ({
         setDeshabilitado(false);
     };
 
-
     return (
         <Modal
             show={mostrarModal}
             onHide={() => setMostrarModal(false)}
             backdrop="static"
-            keyboard={false}
             centered
+            size="lg"
         >
             <Modal.Header closeButton>
                 <Modal.Title>Nuevo Producto</Modal.Title>
@@ -36,9 +35,9 @@ const ModalRegistroProducto = ({
             <Modal.Body>
                 <Form>
                     <Row>
-                        <Col xs={12} med={6}>
+                        <Col xs={12} md={6}>
                             <Form.Group className="mb-3">
-                                <Form.Label>Categoria</Form.Label>
+                                <Form.Label>Categoria *</Form.Label>
                                 <Form.Select
                                     name="categoria_producto"
                                     value={nuevoProducto.categoria_producto || ""}
@@ -91,7 +90,7 @@ const ModalRegistroProducto = ({
                                 <Form.Control
                                     type="file"
                                     accept="image/*"
-                                    onChange={manejoCambioInput}
+                                    onChange={manejoCambioArchivo}
                                     required
                                 />
                             </Form.Group>

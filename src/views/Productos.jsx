@@ -5,6 +5,8 @@ import ModalRegistroProducto from "../components/productos/ModalRegistroProducto
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import CuadrosBusquedas from "../components/busquedas/CuadroBusquedas";
 import Paginacion from "../components/ordenamiento/Paginacion";
+import TablaProductos from "../components/productos/TablaProducto";
+import TarjetaProducto from "../components/productos/TarjetasProducto";
 
 const Productos = () => {
 
@@ -17,6 +19,14 @@ const Productos = () => {
     const [mostrarModal, setMostrarModal] = useState(false);
     const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
     const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
+
+    const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
+    const [paginaActual, establecerPaginaActual] = useState(1);
+
+    const productosPaginados = productosFiltrados.slice(
+        (paginaActual - 1) * registrosPorPagina,
+        paginaActual * registrosPorPagina
+    );
 
     const [nuevoProducto, setNuevoProducto] = useState({
         nombre_producto: "",
@@ -43,6 +53,16 @@ const Productos = () => {
         mensaje: "",
         tipo: "",
     });
+
+    const abrirModalEdicion = (producto) => {
+        setProductoEditar(producto);
+        setMostrarModalEdicion(true);
+    };
+
+    const abrirModalEliminacion = (producto) => {
+        setProductoAEliminar(producto);
+        setMostrarModalEliminacion(true);
+    };
 
     const manejoCambioInput = (e) => {
         const { name, value } = e.target;
@@ -94,7 +114,28 @@ const Productos = () => {
 
     useEffect(() => {
         cargarCategorias();
+        cargarProductos();
     }, []);
+
+    const cargarProductos = async () => {
+        try {
+            setCargando(true);
+
+            const { data, error } = await supabase
+                .from("productos")
+                .select("*")
+                .order("id_producto", { ascending: true });
+
+            if (error) throw error;
+
+            setProductos(data || []);
+            setProductosFiltrados(data || []);
+        } catch (err) {
+            console.error("Error al cargar productos:", err);
+        } finally {
+            setCargando(false);
+        }
+    };
 
     const cargarCategorias = async () => {
         try {
@@ -160,6 +201,8 @@ const Productos = () => {
 
             if (error) throw error;
 
+            cargarProductos();
+
             setNuevoProducto({
                 nombre_producto: "",
                 descripcion_producto: "",
@@ -221,6 +264,55 @@ const Productos = () => {
                     />
                 </Col>
             </Row>
+
+            {!cargando && textoBusqueda.trim() && productosFiltrados.length === 0 && (
+                <Row>
+                    <Col>
+                        <div className="alert alert-info text-center">
+                            No se encontraron productos con "{textoBusqueda}"
+                        </div>
+                    </Col>
+                </Row>
+            )}
+
+            {cargando && (
+                <Row className="text-center my-5">
+                    <Col>
+                        <Spinner animation="border" variant="success" size="lg" />
+                        <p className="mt-3 text-muted">Cargando productos...</p>
+                    </Col>
+                </Row>
+            )}
+
+            {!cargando && productosFiltrados.length > 0 && (
+                <Row>
+                    <Col xs={12} className="d-none d-lg-block">
+                        <TablaProductos
+                            productos={productosPaginados}
+                            abrirModalEdicion={abrirModalEdicion}
+                            abrirModalEliminacion={abrirModalEliminacion}
+                        />
+                    </Col>
+
+                    <Col xs={12} className="d-lg-none">
+                        <TarjetaProducto
+                            productos={productosPaginados}
+                            abrirModalEdicion={abrirModalEdicion}
+                            abrirModalEliminacion={abrirModalEliminacion}
+                        />
+                    </Col>
+                </Row>
+            )}
+
+            {productosFiltrados.length > 0 && (
+                <Paginacion
+                    registrosPorPagina={registrosPorPagina}
+                    totalRegistros={productosFiltrados.length}
+                    paginaActual={paginaActual}
+                    establecerPaginaActual={establecerPaginaActual}
+                    establecerRegistrosPorPagina={establecerRegistrosPorPagina}
+                />
+            )}
 
             <ModalRegistroProducto
                 mostrarModal={mostrarModal}
