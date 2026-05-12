@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Alert, Spinner } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
@@ -7,6 +8,8 @@ import CuadrosBusquedas from "../components/busquedas/CuadroBusquedas";
 import Paginacion from "../components/ordenamiento/Paginacion";
 import TablaProductos from "../components/productos/TablaProducto";
 import TarjetaProducto from "../components/productos/TarjetasProducto";
+import ModalEdicionProducto from "../components/productos/ModalEdicionProducto";
+import ModalEliminacionProducto from "../components/productos/ModalEliminacionProducto";
 
 const Productos = () => {
 
@@ -72,6 +75,27 @@ const Productos = () => {
         }));
     };
 
+    const manejoCambioInputEdicion = (e) => {
+        const { name, value } = e.target;
+        setProductoEditar((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const manejoCambioArchivoActualizar = (e) => {
+        const archivo = e.target.files[0];
+
+        if (archivo && archivo.type.startsWith("image/")) {
+            setProductoEditar((prev) => ({
+                ...prev,
+                archivo,
+            }));
+        } else {
+            alert("Selecciona una imagen válida (JPG, PNG, etc.)");
+        }
+    };
+
     const manejoCambioArchivo = (e) => {
         const archivo = e.target.files[0];
 
@@ -116,6 +140,145 @@ const Productos = () => {
         cargarCategorias();
         cargarProductos();
     }, []);
+
+    const actualizarProducto = async () => {
+        try {
+            // Validación de campos obligatorios
+            if (
+                !productoEditar.nombre_producto?.trim() ||
+                !productoEditar.categoria_producto ||
+                !productoEditar.precio_venta
+            ) {
+                setToast({
+                    mostrar: true,
+                    mensaje: "Completa los campos obligatorios",
+                    tipo: "advertencia",
+                });
+                return;
+            }
+
+            setMostrarModalEdicion(false);
+
+            let datosActualizados = {
+                nombre_producto: productoEditar.nombre_producto.trim(),
+                descripcion_producto: productoEditar.descripcion_producto?.trim() || null,
+                categoria_producto: productoEditar.categoria_producto,
+                precio_venta: parseFloat(productoEditar.precio_venta),
+                url_imagen: productoEditar.url_imagen,
+            };
+
+            // === Manejo de nueva imagen ===
+            if (productoEditar.archivo) {
+                const nombreArchivo = `${Date.now()}_${productoEditar.archivo.name}`;
+
+                // Subir nueva imagen
+                const { error: uploadError } = await supabase.storage
+                    .from('imagenes_productos')
+                    .upload(nombreArchivo, productoEditar.archivo, {
+                        cacheControl: '3600',
+                        upsert: false,
+                    });
+
+                if (uploadError) throw uploadError;
+
+                // Obtener URL pública
+                const { data: urlData } = supabase.storage
+                    .from('imagenes_productos')
+                    .getPublicUrl(nombreArchivo);
+
+                datosActualizados.url_imagen = urlData.publicUrl;
+
+                // Eliminar imagen anterior si existe
+                if (productoEditar.url_imagen) {
+                    try {
+                        const nombreAnterior = productoEditar.url_imagen
+                            .split('/')
+                            .pop()
+                            ?.split('?')[0];
+
+                        if (nombreAnterior) {
+                            await supabase.storage
+                                .from('imagenes_productos')
+                                .remove([nombreAnterior]);
+                        }
+                    } catch (deleteError) {
+                        console.warn("No se pudo eliminar la imagen anterior:", deleteError);
+                        // No bloqueamos la actualización por error al borrar la imagen vieja
+                    }
+                }
+            }
+
+            // Actualizar en la base de datos
+            const { error } = await supabase
+                .from('productos')
+                .update(datosActualizados)
+                .eq('id_producto', productoEditar.id_producto);
+
+            if (error) throw error;
+
+            // Recargar lista y resetear formulario
+            await cargarProductos();
+
+            setProductoEditar({
+                id_producto: "",
+                nombre_producto: "",
+                descripcion_producto: "",
+                categoria_producto: "",
+                precio_venta: "",
+                url_imagen: "",
+                archivo: null,
+            });
+
+            setToast({
+                mostrar: true,
+                mensaje: "Producto actualizado correctamente",
+                tipo: "exito",
+            });
+
+        } catch (err) {
+            console.error("Error al actualizar producto:", err);
+            setToast({
+                mostrar: true,
+                mensaje: "Error al actualizar producto",
+                tipo: "error",
+            });
+        }
+    };
+
+
+    // ✅ AQUÍ ESTÁ LO QUE TE FALTABA
+    const eliminarProducto = async () => {
+        try {
+            if (!productoAEliminar) return;
+
+            const { error } = await supabase
+                .from("productos")
+                .delete()
+                .eq("id_producto", productoAEliminar.id_producto);
+
+            if (error) throw error;
+
+            setMostrarModalEliminacion(false);
+            setProductoAEliminar(null);
+
+            cargarProductos();
+
+            setToast({
+                mostrar: true,
+                mensaje: "Producto eliminado correctamente",
+                tipo: "exito",
+            });
+
+        } catch (err) {
+            console.error("Error al eliminar producto:", err);
+
+            setToast({
+                mostrar: true,
+                mensaje: "Error al eliminar producto",
+                tipo: "error",
+            });
+        }
+    };
 
     const cargarProductos = async () => {
         try {
@@ -240,10 +403,7 @@ const Productos = () => {
                 </Col>
 
                 <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-                    <Button
-                        onClick={() => setMostrarModal(true)}
-                        size="md"
-                    >
+                    <Button onClick={() => setMostrarModal(true)} size="md">
                         <i className="bi-plus-lg"></i>
                         <span className="d-none d-sm-inline ms-2">
                             Nuevo Producto
@@ -313,6 +473,23 @@ const Productos = () => {
                     establecerRegistrosPorPagina={establecerRegistrosPorPagina}
                 />
             )}
+
+            <ModalEdicionProducto
+                mostrarModalEdicion={mostrarModalEdicion}
+                setMostrarModalEdicion={setMostrarModalEdicion}
+                productoEditar={productoEditar}
+                manejoCambioInputEdicion={manejoCambioInputEdicion}
+                manejoCambioArchivoActualizar={manejoCambioArchivoActualizar}
+                actualizarProducto={actualizarProducto}
+                categorias={categorias}
+            />
+
+            <ModalEliminacionProducto
+                mostrarModalEliminacion={mostrarModalEliminacion}
+                setMostrarModalEliminacion={setMostrarModalEliminacion}
+                productoAEliminar={productoAEliminar}
+                eliminarProducto={eliminarProducto}
+            />
 
             <ModalRegistroProducto
                 mostrarModal={mostrarModal}

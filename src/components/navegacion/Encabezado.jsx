@@ -91,6 +91,14 @@ const Encabezado = () => {
                             {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
                             <strong>Productos</strong>
                         </Nav.Link>
+                        
+                         <Nav.Link
+                            onClick={() => manejarNavegacion("/empleados")}
+                            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+                        >
+                            {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
+                            <strong>Empleados</strong>
+                        </Nav.Link>
 
                         {/*Opción para ir al catálogo publico desde admin*/}
                         <Nav.Link
