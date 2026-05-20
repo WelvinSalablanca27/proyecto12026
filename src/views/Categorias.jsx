@@ -13,6 +13,9 @@ import NotificacionOperacion from "../components/NotificacionOperacion";
 import TablaCategorias from "../components/categorias/TablaCategorias";
 import ModalEliminacionCategoria from "../components/categorias/ModalEliminacionCategoria";
 import TarjetaCategoria from "../components/categorias/TarjetaCategoria";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 
 const Categorias = () => {
 
@@ -63,6 +66,34 @@ const Categorias = () => {
   useEffect(() => {
     cargarCategorias();
   }, []);
+
+  const generarPDFCategoria = (categoria) => {
+
+    const doc = new jsPDF();
+
+    // Título
+    doc.setFontSize(18);
+    doc.text("Reporte de Categoría", 14, 20);
+
+    // Línea decorativa
+    doc.line(14, 25, 195, 25);
+
+    // Información de la categoría
+    doc.setFontSize(12);
+
+    autoTable(doc, {
+      startY: 35,
+      head: [["Campo", "Valor"]],
+      body: [
+        ["ID", categoria.id_categoria],
+        ["Nombre", categoria.nombre_categoria],
+        ["Descripción", categoria.descripcion_categoria],
+      ],
+    });
+
+    // Descargar PDF
+    doc.save(`categoria_${categoria.id_categoria}.pdf`);
+  };
 
   // ✏️ Abre el modal de edición con datos cargados
   const abrirModalEdicion = (categoria) => {
@@ -349,9 +380,10 @@ const Categorias = () => {
         <Row>
           <Col xs={12} className="d-none d-lg-block">
             <TablaCategorias
-              categorias={categoriasFiltradas}
+              categorias={categoriasPaginadas}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
+              generarPDFCategoria={generarPDFCategoria}
             />
           </Col>
           {/* 📱 Vista en tarjetas para móvil */}
@@ -384,7 +416,7 @@ const Categorias = () => {
           establecerRegistrosPorPagina={establecerRegistrosPorPagina}
         />
       )}
-      
+
       <ModalEdicionCategoria
         mostrarModalEdicion={mostrarModalEdicion}
         setMostrarModalEdicion={setMostrarModalEdicion}
