@@ -8,10 +8,12 @@ import RutaProtegida from "./components/rutas/RutaProtegida";
 
 // Importaciones de vistas
 import Inicio from "./views/Inicio";
+import Clientes from "./views/Clientes";
 import Categorias from "./views/Categorias";
 import Catalogo from "./views/Catalogo";
 import Productos from "./views/Productos";
 import Login from "./views/Login";
+import Ventas from "./views/Ventas";
 import Empleados from "./views/Empleados";
 import Pagina404 from "./views/Pagina404";
 
@@ -28,9 +30,11 @@ const App = () => {
 
           {/* Rutas protegidas */}
           <Route path="/" element={<RutaProtegida><Inicio /></RutaProtegida>} />
+          <Route path="/clientes" element={<RutaProtegida><Clientes /></RutaProtegida>} />
           <Route path="/categorias" element={<RutaProtegida><Categorias /></RutaProtegida>} />
           <Route path="/catalogo" element={<Catalogo />} /> {/* Ruta pública */}
           <Route path="/empleados" element={<Empleados />} /> {/* Ruta pública */}
+          <Route path="/ventas" element={<Ventas />} /> {/* Ruta pública */}
           <Route path="/productos" element={<RutaProtegida><Productos /></RutaProtegida>} />
 
           {/* Página no encontrada */}
