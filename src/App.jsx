@@ -15,6 +15,7 @@ import Productos from "./views/Productos";
 import Login from "./views/Login";
 import Ventas from "./views/Ventas";
 import Empleados from "./views/Empleados";
+import Dashboard from "./views/Dashboard";
 import Pagina404 from "./views/Pagina404";
 
 const App = () => {
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/empleados" element={<Empleados />} /> {/* Ruta pública */}
           <Route path="/ventas" element={<Ventas />} /> {/* Ruta pública */}
           <Route path="/productos" element={<RutaProtegida><Productos /></RutaProtegida>} />
+          <Route path="/dashboard" element={<Dashboard />} /> {/* Ruta pública */}
 
           {/* Página no encontrada */}
           <Route path="*" element={<Pagina404 />} />

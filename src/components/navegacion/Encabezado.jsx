@@ -126,6 +126,15 @@ const Encabezado = () => {
                         <Nav.Link onClick={() => setMostrarChatIA(true)} className="text-white">
                             <i className="bi bi-robot me-2"></i>
                         </Nav.Link>
+                        
+                        <Nav.Link
+                            onClick={() => manejarNavegacion("/Dashboard")}
+                            className={mostrarMenu ? "color-texto-marca" : "text-white"}
+                        >
+                            {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
+                            <strong>Dashboard</strong>
+                        </Nav.Link>
+                        
 
                         {/*Opción para ir al catálogo publico desde admin*/}
                         <Nav.Link
@@ -135,6 +144,7 @@ const Encabezado = () => {
                             {mostrarMenu ? <i className="bi-images me-2"></i> : null}
                             <strong>Catálogo</strong>
                         </Nav.Link>
+
 
                         <hr />
 
@@ -175,6 +185,7 @@ const Encabezado = () => {
 
     }
     return (
+
         <Navbar expand="md" fixed="top" className="color-navbar shadow-lg" variant="dark">
             <Container>
 
@@ -194,6 +205,9 @@ const Encabezado = () => {
                         <h4 className="mb-0">Discosa</h4>
                     </strong>
                 </Navbar.Brand>
+                <ChatIA mostrar={mostrarChatIA}
+                 onCerrar={() => 
+                 setMostrarChatIA(false)} />
 
                 {/* Boton del menu*/}
                 {!esLogin && (
