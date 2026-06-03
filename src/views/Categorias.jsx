@@ -7,6 +7,7 @@ import CuadrosBusquedas from "../components/busquedas/CuadroBusquedas";
 import Paginacion from "../components/ordenamiento/Paginacion";
 
 // 📦 Importación de modales y componentes auxiliares
+import ModalEnvioCorreoCategorias from "../components/categorias/ModalEnvioCorreoCategorias";
 import ModalRegistroCategoria from "../components/categorias/ModalRegistroCategoria";
 import ModalEdicionCategoria from "../components/categorias/ModalEdicionCategoria"
 import NotificacionOperacion from "../components/NotificacionOperacion";
@@ -15,6 +16,7 @@ import ModalEliminacionCategoria from "../components/categorias/ModalEliminacion
 import TarjetaCategoria from "../components/categorias/TarjetaCategoria";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import emailjs from '@emailjs/browser';
 
 
 const Categorias = () => {
@@ -43,6 +45,11 @@ const Categorias = () => {
   // 📌 Cantidad de registros que se mostrarán por cada página
   const [registrosPorPagina, establecerRegistrosPorPagina] = useState(5);
   const [paginaActual, establecerPaginaActual] = useState(1);
+
+  const [mostrarModalCorreo, setMostrarModalCorreo] = useState(false);
+  const [emailDestino, setEmailDestino] = useState("");
+  const [enviandoCorreo, setEnviandoCorreo] = useState(false);
+
 
   // 📌 Lista de categorías ya filtradas y divididas según la página actual
   const categoriasPaginadas = categoriasFiltradas.slice(
@@ -320,6 +327,81 @@ const Categorias = () => {
       console.error("Excepcion al eliminar categoria:", err.message);
     }
   };
+  // Inicializar EmailJS
+  useEffect(() => {
+    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+  }, []);
+
+  const abrirModalCorreo = () => {
+    setEmailDestino("");
+    setMostrarModalCorreo(true);
+  };
+
+  const formatearCategoriasParaCorreo = () => {
+    if (categorias.length === 0) return "No hay categorías registradas.";
+
+    let texto = `LISTADO DE CATEGORÍAS\n\n`;
+    texto += `Fecha: ${new Date().toLocaleDateString("es-NI")}\n`;
+    texto += `Total de categorías: ${categorias.length}\n\n`;
+
+    categorias.forEach((cat, index) => {
+      texto += `${index + 1}. ${cat.nombre_categoria}\n`;
+      if (cat.descripcion_categoria) {
+        texto += `   Descripción: ${cat.descripcion_categoria}\n`;
+      }
+      texto += `\n`;
+    });
+
+    return texto;
+  };
+
+  const enviarCorreoCategorias = () => {
+    if (!emailDestino.trim()) {
+      setToast({
+        mostrar: true,
+        mensaje: "Por favor ingresa un correo destino.",
+        tipo: "advertencia",
+      });
+      return;
+    }
+
+    setEnviandoCorreo(true);
+
+    const mensaje = formatearCategoriasParaCorreo();
+
+    const templateParams = {
+      to_name: "Administrador",
+      user_email: emailDestino,
+      message: mensaje,
+      fecha_envio: new Date().toLocaleDateString("es-NI")
+    };
+
+    emailjs.send(
+      import.meta.env.VITE_EMAILJS_SERVICE_ID,
+      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+      templateParams
+    )
+      .then(() => {
+        setToast({
+          mostrar: true,
+          mensaje: "Correo enviado correctamente.",
+          tipo: "exito",
+        });
+        setMostrarModalCorreo(false);
+        setEmailDestino("");
+      })
+      .catch((error) => {
+        console.error("Error EmailJS:", error);
+        setToast({
+          mostrar: true,
+          mensaje: "Error al enviar el correo.",
+          tipo: "error",
+        });
+      })
+      .finally(() => {
+        setEnviandoCorreo(false);
+      });
+  };
 
   return (
     <Container className="mt-3">
@@ -396,6 +478,38 @@ const Categorias = () => {
           </Col>
         </Row>
       )}
+      <Row className="align-items-center mb-3">
+        <Col xs={8} sm={8} md={8} lg={8} className="d-flex align-items-center">
+          <h3 className="mb-0">
+            <i className="bi-bookmark-plus-fill me-2"></i> Categorías
+          </h3>
+        </Col>
+        <Col xs={2} sm={2} md={2} lg={2} className="text-end">
+          <Button variant="primary" onClick={abrirModalCorreo} size="md">
+            <i className="bi bi-envelope"></i>
+            <span className="d-none d-lg-inline ms-2">Enviar por Correo</span>
+          </Button>
+        </Col>
+        <Col xs={2} sm={2} md={2} lg={2} className="text-end">
+          <Button
+            onClick={() => setMostrarModal(true)}
+            size="md"
+          >
+            <i className="bi-plus-lg"></i>
+            <span className="d-none d-lg-inline ms-2">Nueva Categoría</span>
+          </Button>
+        </Col>
+      </Row>
+
+      <ModalEnvioCorreoCategorias
+        mostrarModalCorreo={mostrarModalCorreo}
+        setMostrarModalCorreo={setMostrarModalCorreo}
+        emailDestino={emailDestino}
+        setEmailDestino={setEmailDestino}
+        enviandoCorreo={enviandoCorreo}
+        enviarCorreoCategorias={enviarCorreoCategorias}
+        totalCategorias={categorias.length}
+      />
 
       {/* 📦 Modales */}
       <ModalRegistroCategoria
