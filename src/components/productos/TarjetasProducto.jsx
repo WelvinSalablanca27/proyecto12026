@@ -63,11 +63,10 @@ const TarjetaProducto = ({
                                 aria-label={`Producto ${producto.nombre_producto}`}
                             >
                                 <Card.Body
-                                    className={`p-2 ${
-                                        tarjetaActiva
+                                    className={`p-2 ${tarjetaActiva
                                             ? "bg-light"
                                             : "bg-white"
-                                    }`}
+                                        }`}
                                 >
                                     <Row className="align-items-center gx-3">
 
@@ -136,6 +135,17 @@ const TarjetaProducto = ({
                                                 <i className="bi bi-pencil"></i>
                                             </Button>
 
+                                            <Button
+                                                variant="outline-primary"
+                                                size="sm"
+                                                onClick={() => {
+                                                    generarQRImagen(producto);
+                                                    setIdTarjetaActiva(null);
+                                                }}
+                                                title="Generar código QR de la imagen"
+                                            >
+                                                <i className="bi bi-qr-code"></i>
+                                            </Button>
                                             <Button
                                                 variant="outline-danger"
                                                 size="sm"

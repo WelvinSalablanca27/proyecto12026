@@ -10,6 +10,7 @@ import TablaProductos from "../components/productos/TablaProducto";
 import TarjetaProducto from "../components/productos/TarjetasProducto";
 import ModalEdicionProducto from "../components/productos/ModalEdicionProducto";
 import ModalEliminacionProducto from "../components/productos/ModalEliminacionProducto";
+import ModalQRProducto from "../components/productos/ModalQRProducto";
 
 const Productos = () => {
 
@@ -30,6 +31,26 @@ const Productos = () => {
         (paginaActual - 1) * registrosPorPagina,
         paginaActual * registrosPorPagina
     );
+
+    const [mostrarModalQR, setMostrarModalQR] = useState(false);
+    const [productoQR, setProductoQR] = useState(null);
+
+    const generarQRImagen = (producto) => {
+
+        if (!producto?.url_imagen) {
+
+            setToast({
+                mostrar: true,
+                mensaje: "Este producto no tiene imagen asociada",
+                tipo: "advertencia"
+            });
+
+            return;
+        }
+
+        setProductoQR(producto);
+        setMostrarModalQR(true);
+    };
 
     const [nuevoProducto, setNuevoProducto] = useState({
         nombre_producto: "",
@@ -451,6 +472,7 @@ const Productos = () => {
                             productos={productosPaginados}
                             abrirModalEdicion={abrirModalEdicion}
                             abrirModalEliminacion={abrirModalEliminacion}
+                            generarQRImagen={generarQRImagen}
                         />
                     </Col>
 
@@ -459,6 +481,7 @@ const Productos = () => {
                             productos={productosPaginados}
                             abrirModalEdicion={abrirModalEdicion}
                             abrirModalEliminacion={abrirModalEliminacion}
+                            generarQRImagen={generarQRImagen}
                         />
                     </Col>
                 </Row>
@@ -482,6 +505,7 @@ const Productos = () => {
                 manejoCambioArchivoActualizar={manejoCambioArchivoActualizar}
                 actualizarProducto={actualizarProducto}
                 categorias={categorias}
+
             />
 
             <ModalEliminacionProducto
@@ -499,6 +523,12 @@ const Productos = () => {
                 manejoCambioArchivo={manejoCambioArchivo}
                 agregarProducto={agregarProducto}
                 categorias={categorias}
+            />
+
+            <ModalQRProducto
+                mostrar={mostrarModalQR}
+                onHide={() => setMostrarModalQR(false)}
+                producto={productoQR}
             />
 
             <NotificacionOperacion

@@ -46,4 +46,3 @@ const ModalEnvioCorreoCategorias = ({
 };
 
 export default ModalEnvioCorreoCategorias;
-

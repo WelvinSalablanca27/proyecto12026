@@ -50,7 +50,32 @@ const Categorias = () => {
   const [emailDestino, setEmailDestino] = useState("");
   const [enviandoCorreo, setEnviandoCorreo] = useState(false);
 
+  const copiarCategoria = async (categoria) => {
+    if (!categoria) return;
 
+    const texto = `
+ID: ${categoria.id_categoria}
+Categoría: ${categoria.nombre_categoria}
+Descripción: ${categoria.descripcion_categoria || 'Sin descripción'}
+`;
+
+    try {
+      await navigator.clipboard.writeText(texto);
+
+      setToast({
+        mostrar: true,
+        mensaje: `Categoría "${categoria.nombre_categoria}" copiada al portapapeles`,
+        tipo: "exito",
+      });
+    } catch (err) {
+      console.error("Error al copiar:", err);
+      setToast({
+        mostrar: true,
+        mensaje: "No se pudo copiar al portapapeles",
+        tipo: "error",
+      });
+    }
+  };
   // 📌 Lista de categorías ya filtradas y divididas según la página actual
   const categoriasPaginadas = categoriasFiltradas.slice(
     (paginaActual - 1) * registrosPorPagina,
@@ -408,21 +433,27 @@ const Categorias = () => {
 
       {/* 📌 Encabezado */}
       <Row className="align-items-center mb-3">
-        <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
+        <Col xs={8} sm={8} md={8} lg={8} className="d-flex align-items-center">
           <h3 className="mb-0">
             <i className="bi-bookmark-plus-fill me-2"></i> Categorías
           </h3>
         </Col>
-
-        {/* ➕ Botón nueva categoría */}
-        <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} size="md">
+        <Col xs={2} sm={2} md={2} lg={2} className="text-end">
+          <Button variant="primary" onClick={abrirModalCorreo} size="md">
+            <i className="bi bi-envelope"></i>
+            <span className="d-none d-lg-inline ms-2">Enviar por Correo</span>
+          </Button>
+        </Col>
+        <Col xs={2} sm={2} md={2} lg={2} className="text-end">
+          <Button
+            onClick={() => setMostrarModal(true)}
+            size="md"
+          >
             <i className="bi-plus-lg"></i>
-            <span className="d-none d-sm-inline ms-2">Nueva Categoría</span>
+            <span className="d-none d-lg-inline ms-2">Nueva Categoría</span>
           </Button>
         </Col>
       </Row>
-
       <hr />
 
       {/* 🔍 Cuadro de Busqueda debajo de la linea divisoria */}
@@ -466,6 +497,7 @@ const Categorias = () => {
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
               generarPDFCategoria={generarPDFCategoria}
+              copiarCategoria={copiarCategoria}
             />
           </Col>
           {/* 📱 Vista en tarjetas para móvil */}
@@ -474,32 +506,11 @@ const Categorias = () => {
               categorias={categoriasFiltradas}
               abrirModalEdicion={abrirModalEdicion}
               abrirModalEliminacion={abrirModalEliminacion}
+              copiarCategoria={copiarCategoria}
             />
           </Col>
         </Row>
       )}
-      <Row className="align-items-center mb-3">
-        <Col xs={8} sm={8} md={8} lg={8} className="d-flex align-items-center">
-          <h3 className="mb-0">
-            <i className="bi-bookmark-plus-fill me-2"></i> Categorías
-          </h3>
-        </Col>
-        <Col xs={2} sm={2} md={2} lg={2} className="text-end">
-          <Button variant="primary" onClick={abrirModalCorreo} size="md">
-            <i className="bi bi-envelope"></i>
-            <span className="d-none d-lg-inline ms-2">Enviar por Correo</span>
-          </Button>
-        </Col>
-        <Col xs={2} sm={2} md={2} lg={2} className="text-end">
-          <Button
-            onClick={() => setMostrarModal(true)}
-            size="md"
-          >
-            <i className="bi-plus-lg"></i>
-            <span className="d-none d-lg-inline ms-2">Nueva Categoría</span>
-          </Button>
-        </Col>
-      </Row>
 
       <ModalEnvioCorreoCategorias
         mostrarModalCorreo={mostrarModalCorreo}

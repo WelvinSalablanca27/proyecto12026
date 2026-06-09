@@ -190,7 +190,9 @@ const Encabezado = () => {
             <Container>
 
                 <Navbar.Brand
-                    onClick={() => manejarNavegacion(esCatalogo ? "/catalogo" : "/")}
+                    onClick={() => manejarNavegacion(esCatalogo ? "/catalogo" : "/"
+                    )
+                }
                     className="text-white fw-bold d-flex align-items-center"
                     style={{ cursor: "pointer" }}
                 >
